@@ -23,8 +23,7 @@ class FanController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'nama_liga' =>'required|unique:ligas',
-            'negara' => 'required',
+            'nama_fan' =>'required|unique:fans',
         ]);
         if($validate->fails()){
             return response()->json([
@@ -35,14 +34,13 @@ class FanController extends Controller
         }
 
         try {
-            $liga = New Liga;
-            $liga->nama_liga = $request->nama_liga;
-            $liga->negara = $request->negara;
-            $liga->save();
+            $fan = New Fan;
+            $fan->nama_fan = $request->nama_fan;
+            $fan->save();
             return response()->json([
                 'success' =>true,
-                'message' =>'data liga berhasil dibuat',
-                'data' => $liga,
+                'message' =>'data fan berhasil dibuat',
+                'data' => $fan,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -56,11 +54,11 @@ class FanController extends Controller
     public function show($id)
     {
         try{
-            $liga = Liga::findOrFail($id);
+            $fan = fan::findOrFail($id);
             return response()->json([
                 'success' =>true,
-                'message' =>'Detail Liga',
-                'data' => $liga,
+                'message' =>'Detail fan',
+                'data' => $fan,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -73,8 +71,7 @@ class FanController extends Controller
     public function update(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'nama_liga' =>'required',
-            'negara' => 'required',
+            'nama_fan' =>'required',
         ]);
         if($validate->fails()){
             return response()->json([
@@ -85,14 +82,13 @@ class FanController extends Controller
         }
 
         try {
-            $liga = Liga::findOrFail($id);
-            $liga->nama_liga = $request->nama_liga;
-            $liga->negara = $request->negara;
-            $liga->save();
+            $fan = Fan::findOrFail($id);
+            $fan->nama_fan = $request->nama_fan;
+            $fan->save();
             return response()->json([
                 'success' =>true,
-                'message' =>'data liga berhasil dirubah',
-                'data' => $liga,
+                'message' =>'data fan berhasil dirubah',
+                'data' => $fan,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
@@ -106,11 +102,11 @@ class FanController extends Controller
     public function destroy($id)
     {
         try{
-            $liga = Liga::findOrFail($id);
-            $liga->delete();
+            $fan = Fan::findOrFail($id);
+            $fan->delete();
             return response()->json([
                 'success' =>true,
-                'message' =>'Data '. $liga->nama_liga . 'berhasil dihapus',
+                'message' =>'Data '. $fan->nama_fan . 'berhasil dihapus',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
