@@ -11,19 +11,21 @@ class FanController extends Controller
 {
     public function index()
     {
-        $fan = Fan::latest()->get();
-        $res = [
+        $fan = Fan::with('klub')->latest()->get();
+        return response()->json([
+      
             'success'=> true,
             'message'=> 'Daftar Fan',
             'data'=> $fan,
-        ];
-        return response()->json($res, 200);
+        ],200);
+   
     }
 
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'nama_fan' =>'required|unique:fans',
+            'nama_fan' =>'required',
+            'klub' =>'required|array',
         ]);
         if($validate->fails()){
             return response()->json([
@@ -37,6 +39,8 @@ class FanController extends Controller
             $fan = New Fan;
             $fan->nama_fan = $request->nama_fan;
             $fan->save();
+            // lampirkan banyak klub
+            $fan->klub()->attach($request->klub);
             return response()->json([
                 'success' =>true,
                 'message' =>'data fan berhasil dibuat',
@@ -104,14 +108,16 @@ class FanController extends Controller
         try{
             $fan = Fan::findOrFail($id);
             $fan->delete();
+            $fan->klub()->detach();
             return response()->json([
                 'success' =>true,
-                'message' =>'Data '. $fan->nama_fan . 'berhasil dihapus',
+                'message' =>'berhasil dihapus',
+                'Data '=> $fan,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' =>false,
-                'message' =>'data tidak ditemukan!',
+                'message' =>'Terjadi kesalahan!',
                 'errors' => $e->getMessage(),
             ], 404);
         }

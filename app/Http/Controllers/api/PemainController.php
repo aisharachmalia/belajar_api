@@ -14,9 +14,9 @@ class PemainController extends Controller
     {
         $pemain = Pemain::latest()->get();
         $res = [
-            'success'=> true,
-            'message'=> 'Daftar pemain Sepak Bola',
-            'data'=> $pemain,
+            'success' => true,
+            'message' => 'Daftar pemain Sepak Bola',
+            'data' => $pemain,
         ];
         return response()->json($res, 200);
     }
@@ -24,42 +24,44 @@ class PemainController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            'nama_pemain' =>'required',
+            'nama_pemain' => 'required',
             'foto' => 'required|image|max:2048',
-            'tgl_lahir' =>'required',
-            'harga_pasar' =>'required',
-            'posisi' =>'required',
-            'negara' =>'required',
-            'id_klub' =>'required',
+            'tgl_lahir' => 'required|date',
+            'harga_pasar' => 'required|numeric',
+            'posisi' => 'required|string',
+            'negara' => 'required|string',
+            'id_klub' => 'required|integer',
         ]);
-        if($validate->fails()){
+
+        if ($validate->fails()) {
             return response()->json([
-                'success' =>false,
-                'message' =>'validasi gagal',
+                'success' => false,
+                'message' => 'validasi gagal',
                 'errors' => $validate->errors(),
             ], 422);
         }
 
         try {
             $path = $request->file('foto')->store('public/foto');
-            $pemain = New Pemain;
+            $pemain = new Pemain;
             $pemain->nama_pemain = $request->nama_pemain;
             $pemain->foto = $path;
-            $pemain->tgl_lahir =$request->tgl_lahir;
-            $pemain->harga_pasar =$request->harga_pasar;
-            $pemain->posisi =$request->posisi;
-            $pemain->negara =$request->negara;
-            $pemain->id_klub =$request->id_klub;
+            $pemain->tgl_lahir = $request->tgl_lahir;
+            $pemain->harga_pasar = $request->harga_pasar;
+            $pemain->posisi = $request->posisi;
+            $pemain->negara = $request->negara;
+            $pemain->id_klub = $request->id_klub;
             $pemain->save();
+
             return response()->json([
-                'success' =>true,
-                'message' =>'data berhasil dibuat',
+                'success' => true,
+                'message' => 'data berhasil dibuat',
                 'data' => $pemain,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'success' =>false,
-                'message' =>'terjadi kesalahan',
+                'success' => false,
+                'message' => 'terjadi kesalahan',
                 'errors' => $e->getMessage(),
             ], 500);
         }
@@ -67,32 +69,34 @@ class PemainController extends Controller
 
     public function show($id)
     {
-        try{
+        try {
             $pemain = Pemain::findOrFail($id);
             return response()->json([
-                'success' =>true,
-                'message' =>'Detail pemain',
+                'success' => true,
+                'message' => 'Detail pemain',
                 'data' => $pemain,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'success' =>false,
-                'message' =>'data tidak ditemukan!',
+                'success' => false,
+                'message' => 'data tidak ditemukan!',
                 'errors' => $e->getMessage(),
             ], 404);
         }
     }
+
     public function update(Request $request, $id)
     {
         $validate = Validator::make($request->all(), [
-            'nama_pemain' =>'required',
-            'foto' => 'required|image|max:2048',
-            'tgl_lahir' =>'required',
-            'harga_pasar' =>'required',
-            'posisi' =>'required',
-            'negara' =>'required',
-            'id_klub' =>'required',
+            'nama_pemain' => 'required',
+            'foto' => 'nullable|image|max:2048',
+            'tgl_lahir' => 'required|date',
+            'harga_pasar' => 'required|numeric',
+            'posisi' => 'required|string',
+            'negara' => 'required|string',
+            'id_klub' => 'required|integer',
         ]);
+
         if ($validate->fails()) {
             return response()->json([
                 'success' => false,
@@ -103,28 +107,28 @@ class PemainController extends Controller
 
         try {
             $pemain = Pemain::findOrFail($id);
-            if($request->hasFile('foto')){
-                storage::delete($pemain->foto);
+            if ($request->hasFile('foto')) {
+                Storage::delete($pemain->foto);
                 $path = $request->file('foto')->store('public/foto');
-                $pemain->foto =$path;
+                $pemain->foto = $path;
             }
             $pemain->nama_pemain = $request->nama_pemain;
-            $pemain->foto = $path;
-            $pemain->tgl_lahir =$request->tgl_lahir;
-            $pemain->harga_pasar =$request->harga_pasar;
-            $pemain->posisi =$request->posisi;
-            $pemain->negara =$request->negara;
-            $pemain->id_klub =$request->id_klub;
+            $pemain->tgl_lahir = $request->tgl_lahir;
+            $pemain->harga_pasar = $request->harga_pasar;
+            $pemain->posisi = $request->posisi;
+            $pemain->negara = $request->negara;
+            $pemain->id_klub = $request->id_klub;
             $pemain->save();
+
             return response()->json([
-                'success' =>true,
-                'message' =>'data pemain berhasil dirubah',
+                'success' => true,
+                'message' => 'data pemain berhasil dirubah',
                 'data' => $pemain,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'success' =>false,
-                'message' =>'terjadi kesalahan',
+                'success' => false,
+                'message' => 'terjadi kesalahan',
                 'errors' => $e->getMessage(),
             ], 500);
         }
@@ -132,23 +136,20 @@ class PemainController extends Controller
 
     public function destroy($id)
     {
-        try{
+        try {
             $pemain = Pemain::findOrFail($id);
+            Storage::delete($pemain->foto); // Jangan lupa untuk menghapus foto dari storage
             $pemain->delete();
             return response()->json([
-                'success' =>true,
-                'message' =>'Data '. $pemain->nama_pemain . 'berhasil dihapus',
+                'success' => true,
+                'message' => 'Data ' . $pemain->nama_pemain . ' berhasil dihapus',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'success' =>false,
-                'message' =>'data tidak ditemukan!',
+                'success' => false,
+                'message' => 'data tidak ditemukan!',
                 'errors' => $e->getMessage(),
             ], 404);
         }
     }
-
-
 }
-  
- 

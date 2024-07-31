@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('posisi', ['gk', 'df', 'mf', 'fw']);
             $table->string('negara');
             $table->unsignedBigInteger('id_klub');
-            // $table->foreign('id_klub')->references('id')->on('klubs')->onDelete('cascade');
+            $table->foreign('id_klub')->references('id')->on('klubs')->onDelete('cascade');
             $table->timestamps();
         });
     }
